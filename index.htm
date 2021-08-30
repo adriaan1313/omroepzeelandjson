@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title>le stuff</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js" charset="utf-8"></script>
+  </head>
+  <body>
+    <input type="text" name="query" value="Tv" id="query"><button type="button" name="button" onclick="doTheStuff();">go</button>
+    <textarea id="out" name="out" rows="8" cols="80"></textarea>
+    <input disabled type="text" id="perc"></p>
+    <script type="text/javascript">
+      let output = [];
+      function sleep(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+      }
+      async function doTheStuff() {
+        const q = $("#query").val();
+        $.getJSON(`https://www.omroepzeeland.nl/RadioTv/Results?medium=${q}&page=1`, gotPageOne);
+      }
+      async function gotPageOne(data){
+        const q = $("#query").val();
+        for(let i = 1; i <= data.pageCount; i++){
+          $.getJSON(`https://www.omroepzeeland.nl/RadioTv/Results?medium=${q}&page=${i}`, gotPage);
+            await sleep(50);
+        }
+      }
+      async function gotPage(data){
+        output = output.concat(data.searchResults);
+        $("#perc").val(Math.round(output.length/data.total*1000)/10+"%");
+        if(output.length == data.total)$('#out').val(JSON.stringify(output));
+      }
+    </script>
+  </body>
+</html>
